@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Do I.T. Better — Stress-Free Tech Support, Websites, Cloud & Security</title>
+  <meta name="description" content="Full-service I.T. help for home users and small businesses: repairs, websites, networking, cloud, databases, and cybersecurity — friendly, clear, no jargon." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Leaflet (Map) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    /* THEME TOKENS */
+    :root{
+      --bg:#0b1220; --panel:#0f172a; --panel-2:#111827;
+      --text:#f8fafc; --muted:#94a3b8;
+      --accent:#80ced7; --accent-2:#5dfdcb; --primary:#22c55e;
+      --ring:rgba(128,206,215,.55);
+      --shadow:0 10px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.2);
+      --radius:18px; --radius-sm:12px; --maxw:1200px; --pad:clamp(16px,4vw,28px);
+      --grad: conic-gradient(from 90deg at 50% 50%, #5dfdcb, #80ced7, #22c55e, #5dfdcb);
+      --border: rgba(255,255,255,.10);
+      --soft: rgba(255,255,255,.06);
+      --soft-2: rgba(255,255,255,.03);
+    }
+    html[data-theme="light"]{
+      --bg:#f6fafb; --panel:#ffffff; --panel-2:#f8fbfc;
+      --text:#0b1220; --muted:#475569;
+      --accent:#007EA7; --accent-2:#5dd7ff; --primary:#22a35e;
+      --ring:rgba(0,126,167,.25);
+      --shadow:0 12px 26px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+      --border: rgba(2,6,23,.10);
+      --soft: rgba(2,6,23,.06);
+      --soft-2: rgba(2,6,23,.03);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--accent) 20%, transparent), transparent 60%),
+        radial-gradient(800px 400px at 10% 20%, color-mix(in oklab, var(--accent-2) 18%, transparent), transparent 50%),
+        var(--bg);
+    }
+    a{color:inherit}
+    .container{max-width:var(--maxw); margin:0 auto; padding:0 var(--pad)}
+    .btn{
+      display:inline-flex; align-items:center; gap:.6rem;
+      background:linear-gradient(180deg, var(--accent), color-mix(in oklab, var(--accent) 70%, #59BECB));
+      color:#0b1220; border:none; padding:.9rem 1.2rem; border-radius:999px; font-weight:700; text-decoration:none;
+      box-shadow:var(--shadow);
+      transition:transform .12s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); filter:saturate(1.05)}
+    .btn:focus-visible{outline:4px solid var(--ring)}
+    .btn-outline{background:transparent; color:var(--text); border:1px solid var(--border)}
+
+    header{position:sticky; top:0; z-index:50; backdrop-filter:saturate(120%) blur(10px); background:color-mix(in oklab, var(--bg) 78%, transparent); border-bottom:1px solid var(--border)}
+    .nav{display:flex; align-items:center; justify-content:space-between; min-height:64px}
+    .brand{display:flex; align-items:center; gap:.8rem; font-weight:900; letter-spacing:.3px}
+    .brand .logo{
+      width:42px; height:42px; border-radius:12px; overflow:hidden; position:relative;
+      display:grid; place-items:center; box-shadow:var(--shadow);
+      animation:mascot-bob 6s ease-in-out infinite;
+    }
+    .brand .logo img{width:100%; height:100%; object-fit:cover}
+    .brand:hover .logo{animation:mascot-hover .9s ease-out forwards}
+
+    nav ul{display:flex; list-style:none; gap:1.2rem; padding:0; margin:0}
+    nav a{display:inline-block; padding:.55rem .7rem; border-radius:999px; text-decoration:none; color:var(--muted)}
+    nav a:hover{background:var(--soft); color:var(--text)}
+    .nav-cta{display:flex; align-items:center; gap:.6rem}
+    .hamburger, .mode-btn{
+      display:none; cursor:pointer; width:40px; height:40px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text)
+    }
+
+    .hero{padding: clamp(48px, 8vw, 110px) 0 0; position:relative; overflow:hidden}
+    .hero-grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:32px; align-items:center}
+    .eyebrow{color:var(--accent-2); text-transform:uppercase; letter-spacing:.18em; font-weight:800; font-size:.8rem}
+    h1{font-size:clamp(28px, 4.4vw, 56px); margin:.5rem 0 1rem; line-height:1.05}
+    .spark{background:linear-gradient(90deg,#fff, var(--accent-2) 40%, var(--accent) 60%, #fff); -webkit-background-clip:text; background-clip:text; color:transparent; background-size:200% 100%; animation:sheen 4.5s ease-in-out infinite}
+    .hero p{color:var(--muted); font-size: clamp(1.05rem, 1.4vw, 1.2rem)}
+    .hero-cta{display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1.2rem}
+    .placeholder{width:100%; aspect-ratio: 4/3; border-radius:var(--radius); border:1px dashed var(--border); display:grid; place-items:center; color:var(--muted); background:linear-gradient(180deg, var(--soft), var(--soft-2))}
+
+    /* Orbs (parallax) */
+    .orb{position:absolute; border-radius:999px; filter:blur(50px); opacity:.18; pointer-events:none; transform:translate3d(var(--tx,0px), var(--ty,0px), 0)}
+    .orb.a{width:300px; height:300px; background:var(--accent-2); top:-60px; right:10%;}
+    .orb.b{width:220px; height:220px; background:var(--accent); bottom:40px; left:8%; animation:float 11s ease-in-out infinite;}
+    .orb.c{width:260px; height:260px; background:var(--primary); top:10%; left:35%; animation:float 14s ease-in-out infinite reverse;}
+
+    section{padding: 64px 0}
+    .section-head{display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; margin-bottom:22px}
+    .section-head h2{margin:0; font-size: clamp(22px, 3vw, 34px)}
+    .muted{color:var(--muted)}
+
+    .tiles{display:grid; grid-template-columns: repeat(4, 1fr); gap:16px}
+    .tile{background:linear-gradient(180deg, var(--soft), var(--soft-2)); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow: var(--shadow)}
+    .tile h3{margin:.2rem 0 .4rem; font-size:1.05rem}
+    .tile p{margin:0; color:var(--muted); font-size:.98rem}
+    .cards{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px}
+    .card{background:linear-gradient(180deg, var(--soft), var(--soft-2)); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow)}
+    .card h3{margin:.4rem 0 .6rem}
+    .card ul{margin:0; padding-left:1.2rem; color:var(--muted)}
+
+    .plans{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px; align-items:stretch}
+    .plan{background:linear-gradient(180deg, var(--soft), var(--soft-2)); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); display:flex; flex-direction:column}
+    .plan.pop{border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 35%, transparent), var(--shadow)}
+    .price{font-size: 2rem; font-weight:900; margin:.2rem 0 .8rem}
+    .plan ul{flex:1; color:var(--muted); padding-left:1.2rem}
+
+    .about{display:grid; grid-template-columns: 1.1fr .9fr; gap:24px; align-items:center}
+    .about img{width:100%; height:auto; border-radius:18px; display:block}
+    .quotes{display:grid; grid-template-columns: repeat(3,1fr); gap:16px}
+    .quote{background:linear-gradient(180deg, var(--soft), var(--soft-2)); border:1px solid var(--border); border-radius:var(--radius); padding:18px}
+    details{background:var(--soft-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 16px}
+    details+details{margin-top:10px}
+    summary{cursor:pointer; font-weight:600}
+
+    form{display:grid; gap:12px}
+    input, textarea, select{width:100%; padding:12px 14px; border-radius:12px; background:color-mix(in oklab, var(--bg) 95%, #0000); color:var(--text); border:1px solid var(--border); outline:none}
+    input:focus, textarea:focus, select:focus{box-shadow: 0 0 0 4px var(--ring); border-color:var(--accent)}
+    .grid-2{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    footer{padding:40px 0 80px; color:var(--muted); border-top:1px solid var(--border)}
+
+    .reveal{opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease; will-change:transform}
+    .reveal.in{opacity:1; transform:none}
+    .pill{display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .6rem; border-radius:999px; border:1px solid var(--border); color:var(--muted); font-size:.9rem}
+    .check{display:inline-grid; place-items:center; width:22px; height:22px; border-radius:6px; background:color-mix(in oklab, var(--accent) 18%, transparent); border:1px solid color-mix(in oklab, var(--accent) 50%, transparent)}
+    .spacer{height:8px}
+
+    .fab{
+      position:fixed; right:18px; bottom:18px; z-index:60;
+      display:grid; gap:10px; justify-items:end;
+    }
+    .fab .btn-round{
+      width:56px; height:56px; border-radius:999px; display:grid; place-items:center; border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--soft), var(--soft-2));
+      box-shadow:var(--shadow); cursor:pointer;
+      transition:transform .12s ease, filter .2s ease;
+    }
+    .fab .btn-round:hover{transform:translateY(-1px)}
+    .fab .menu{display:none}
+    .fab.open .menu{display:grid}
+    .fab a.quick{display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; background:var(--soft); border:1px solid var(--border); padding:.5rem .7rem; border-radius:999px}
+
+    .chat{
+      position:fixed; right:18px; bottom:86px; width:min(360px, 92vw); z-index:59;
+      background:linear-gradient(180deg, var(--soft), var(--soft-2)); border:1px solid var(--border);
+      border-radius:16px; box-shadow:var(--shadow); display:none;
+    }
+    .chat.open{display:block}
+    .chat header{position:relative; backdrop-filter:none; background:color-mix(in oklab, var(--bg) 90%, transparent); border-bottom:1px solid var(--border)}
+    .chat .row{display:flex; gap:10px; padding:12px}
+    .chat input{flex:1}
+    .chat .msgs{max-height:260px; overflow:auto; padding:12px; display:grid; gap:10px}
+    .bubble{background:color-mix(in oklab, var(--bg) 95%, transparent); border:1px solid var(--border); padding:10px 12px; border-radius:12px; color:var(--text);}
+
+    .wave-wrap{display:block; position:relative; margin-top:42px}
+    .wave-wrap svg{display:block; width:100%; height:auto}
+
+    /* Map container height */
+    #map{width:100%; aspect-ratio:16/9; border-radius:18px; border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden}
+
+    /* Animations */
+    @keyframes sheen{0%,100%{background-position:200% 0}50%{background-position:0% 0}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    @keyframes mascot-bob{0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)}}
+    @keyframes mascot-hover{0%{transform:translateY(0)} 60%{transform:translateY(-6px)} 100%{transform:translateY(-4px)}}
+
+    @media (max-width:1024px){
+      .hero-grid{grid-template-columns:1fr}
+      .tiles{grid-template-columns: repeat(2, 1fr)}
+      .cards{grid-template-columns: repeat(2, 1fr)}
+      .plans{grid-template-columns:1fr}
+      .about{grid-template-columns:1fr}
+      .quotes{grid-template-columns:1fr}
+      nav ul{display:none}
+      .hamburger, .mode-btn{display:block}
+      .mobile-nav{display:none}
+      .mobile-nav.open{display:grid}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none !important; transition:none !important}
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="pill" style="position:absolute; left:-999px; top:auto">Skip to content</a>
+
+  <header>
+    <div class="container nav">
+      <div class="brand" title="Do I.T. Better">
+        <div class="logo"><img src="images/logo.png" alt="Do I.T. Better logo"></div>
+        <a href="#home" style="text-decoration:none"><span>Do I.T. Better</span></a>
+      </div>
+
+      <nav aria-label="primary">
+        <ul>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#packages">Packages</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-cta">
+        <button class="mode-btn" id="modeBtn" aria-label="Toggle light/dark">🌓</button>
+        <a href="#contact" class="btn" aria-label="Book a free consultation">Book Now</a>
+        <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">☰</button>
+      </div>
+    </div>
+
+    <div class="container mobile-nav" id="mobileNav" style="padding-bottom:12px">
+      <nav aria-label="mobile">
+        <ul style="display:grid; gap:8px; list-style:none; padding:0; margin:0">
+          <li><a href="#services" onclick="toggleMenu(false)">Services</a></li>
+          <li><a href="#packages" onclick="toggleMenu(false)">Packages</a></li>
+          <li><a href="#about" onclick="toggleMenu(false)">About</a></li>
+          <li><a href="#faq" onclick="toggleMenu(false)">FAQ</a></li>
+          <li><a href="#contact" onclick="toggleMenu(false)">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="orb a" aria-hidden="true"></div>
+      <div class="orb b" aria-hidden="true"></div>
+      <div class="orb c" aria-hidden="true"></div>
+
+      <div class="container hero-grid">
+        <div class="reveal">
+          <div class="eyebrow">The Stress-Free Way to Do I.T.</div>
+          <h1 class="spark">Fix it. Build it. Secure it.<br>We do I.T. better.</h1>
+          <p>Friendly, full-service tech help for home users and small businesses — from laptop repairs and Wi-Fi fixes to websites, cloud, databases and cybersecurity. No confusion. No stress. Just I.T.</p>
+          <div class="hero-cta">
+            <a class="btn" href="#contact">Get Help Now</a>
+            <a class="btn btn-outline" href="#services">Explore Services</a>
+          </div>
+          <div class="badges" aria-label="certifications" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px">
+            <span class="badge pill">Azure & Google Cyber Certified</span>
+            <span class="badge pill">Remote & On-Site Support</span>
+            <span class="badge pill">Patient, Jargon-Free Help</span>
+          </div>
+        </div>
+        <div class="reveal">
+          <img src="images/hero.png" alt="Do I.T. Better hero image" style="width:100%;height:auto;border-radius:18px;display:block">
+        </div>
+      </div>
+
+      <div class="wave-wrap" aria-hidden="true">
+        <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
+          <path d="M0,64 C240,128 480,0 720,48 C960,96 1200,128 1440,64 L1440 140 L0 140 Z"
+                fill="currentColor" opacity=".08"></path>
+          <path d="M0,84 C240,148 480,20 720,68 C960,116 1200,148 1440,84 L1440 140 L0 140 Z"
+                fill="currentColor" opacity=".06"></path>
+          <path d="M0,104 C240,168 480,40 720,88 C960,136 1200,168 1440,104 L1440 140 L0 140 Z"
+                fill="currentColor" opacity=".04"></path>
+        </svg>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section aria-labelledby="highlights">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="highlights">Everything I.T. — From Code to Cables</h2>
+          <p class="muted">Clear, empowering support across your entire stack.</p>
+        </div>
+        <div class="tiles">
+          <div class="tile reveal">
+            <div class="pill"><span class="check">🛠️</span> Repairs & Setup</div>
+            <h3>Computer & Device Support</h3>
+            <p>Laptop/PC repairs, upgrades, OS installs, malware removal, printer & device setup.</p>
+          </div>
+          <div class="tile reveal">
+            <div class="pill"><span class="check">🌐</span> Websites & Cloud</div>
+            <h3>Web Design & Hosting</h3>
+            <p>Business sites, e-commerce, domains & email, SEO basics, booking & forms.</p>
+          </div>
+          <div class="tile reveal">
+            <div class="pill"><span class="check">🔒</span> Cybersecurity</div>
+            <h3>Security & Backups</h3>
+            <p>2FA, antivirus, M365/Google hardening, secure file-sharing, phishing training.</p>
+          </div>
+          <div class="tile reveal">
+            <div class="pill"><span class="check">📡</span> Networking</div>
+            <h3>Wi-Fi & Networks</h3>
+            <p>Mesh Wi-Fi, router setup, cabling, VPN, firewall/port forwarding, smart home.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="services-title">Services</h2>
+          <p class="muted">From fixes to foundations — we build better I.T.</p>
+        </div>
+        <div class="cards">
+          <article class="card reveal"><h3>Computer & Devices</h3>
+            <ul>
+              <li>PC/Mac/Linux repairs & upgrades</li><li>OS installs & tune-ups</li><li>Malware/ransomware removal</li><li>Laptop screen, battery & keyboard</li><li>Printers & peripherals</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Networking & Internet</h3>
+            <ul>
+              <li>Home/office network setup</li><li>Wi-Fi optimisation & mesh</li><li>Ethernet runs & patch panels</li><li>VPN & secure remote access</li><li>Firewall & port forwarding</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Cybersecurity</h3>
+            <ul>
+              <li>Risk assessments & hardening</li><li>M365 & Google Workspace security</li><li>2FA setup & password hygiene</li><li>Secure backups & file-sharing</li><li>Phishing/scam awareness training</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Websites & Hosting</h3>
+            <ul>
+              <li>WordPress, Wix, Squarespace, Shopify</li><li>Domains, email & DNS</li><li>SEO basics & Google Business</li><li>Forms, bookings & payments</li><li>Maintenance & troubleshooting</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Databases & Backend</h3>
+            <ul>
+              <li>MySQL, Postgres, Azure SQL</li><li>CRUD/admin tools & dashboards</li><li>Data migration & optimisation</li><li>Backups & automations</li><li>Website ↔ database integrations</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Cloud & Platforms</h3>
+            <ul>
+              <li>Azure & Google Cloud setup</li><li>Office 365 / Google Workspace</li><li>Hybrid work & remote access</li><li>Cloud storage & sync</li><li>Identity & access management</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Senior-Friendly Coaching</h3>
+            <ul>
+              <li>1-on-1 support</li><li>Password managers made simple</li><li>Printed guides & cheat sheets</li><li>Safe internet use & scam tips</li><li>Home tech organisation</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Business & Automation</h3>
+            <ul>
+              <li>Full I.T. setup for new offices</li><li>CRM, booking & automation tools</li><li>Cybersecurity policies for small teams</li><li>Digital business cards & QR codes</li><li>Ongoing support plans</li>
+            </ul>
+          </article>
+          <article class="card reveal"><h3>Game Design Coaching</h3>
+            <ul>
+              <li>Unity, Godot or Unreal basics</li><li>Mechanics, level design & UI/UX</li><li>Install engines & publish simple games</li><li>Kids & hobbyist-friendly</li><li>itch.io / WebGL help</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PACKAGES -->
+    <section id="packages" aria-labelledby="packages-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="packages-title">Service Packages</h2>
+          <p class="muted">Choose a bundle — or mix & match. Custom quotes available.</p>
+        </div>
+        <div class="plans">
+          <article class="plan reveal" aria-label="Starter Plan">
+            <h3>🟢 Starter</h3>
+            <div class="price">$ — On request</div>
+            <ul>
+              <li>PC/Laptop repairs & tune-ups</li><li>OS reinstall & device setup</li><li>Virus & malware removal</li><li>Wi-Fi & printer help</li><li>Jargon-free coaching</li>
+            </ul>
+            <a class="btn" href="#contact">Enquire</a>
+          </article>
+          <article class="plan pop reveal" aria-label="Pro Plan (recommended)">
+            <div class="pill">Most Popular</div>
+            <h3>🔵 Pro</h3>
+            <div class="price">$$ — On request</div>
+            <ul>
+              <li>Everything in Starter</li><li>Network setup & Wi-Fi optimisation</li><li>Website design (basic → intermediate)</li><li>Domain, email & cloud backup</li><li>Security hardening (2FA, AV)</li>
+            </ul>
+            <a class="btn" href="#contact">Get a Quote</a>
+          </article>
+          <article class="plan reveal" aria-label="Full Stack Plan">
+            <h3>🔴 Full Stack</h3>
+            <div class="price">$$$ — On request</div>
+            <ul>
+              <li>Everything in Starter + Pro</li><li>Custom website or e-commerce</li><li>Azure/Google Cloud integration</li><li>Relational database design</li><li>Cybersecurity audit & policies</li>
+            </ul>
+            <a class="btn" href="#contact">Start a Project</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" aria-labelledby="about-title">
+      <div class="container about">
+        <div class="reveal">
+          <div class="eyebrow">Why choose us</div>
+          <h2 id="about-title">Tech support that’s actually supportive.</h2>
+          <p class="muted">We make technology work for you — not the other way around. Clear communication, honest advice and friendly, patient help for every skill level. From blueprints to backups, we handle I.T. all.</p>
+          <div class="badges" style="display:flex; gap:8px; flex-wrap:wrap">
+            <span class="badge pill">“Clarity, not complexity.”</span>
+            <span class="badge pill">“Solutions, not excuses.”</span>
+            <span class="badge pill">One partner. Every solution.</span>
+          </div>
+          <div class="hero-cta" style="margin-top:18px">
+            <a class="btn" href="#contact">Book a Free Chat</a>
+            <a class="btn btn-outline" href="#faq">Read FAQs</a>
+          </div>
+        </div>
+        <div class="reveal">
+          <img src="images/about.png" alt="Barry from Do I.T. Better helping a client (Sunshine Coast)">
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section aria-labelledby="testimonials">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="testimonials">What clients say</h2>
+          <p class="muted">Add your reviews here once you collect them.</p>
+        </div>
+        <div class="quotes">
+          <div class="quote reveal">“Fixed my Wi-Fi and set up email in one visit. Clear, simple, and no stress!” — <em>Jane, local client</em></div>
+          <div class="quote reveal">“Built our website and secured our cloud. Reliable and fast.” — <em>Sam, small business</em></div>
+          <div class="quote reveal">“Patient coaching for my parents — they finally feel confident online.” — <em>Ash, family</em></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="faq-title">FAQ</h2>
+          <p class="muted">Quick answers to common questions.</p>
+        </div>
+        <details class="reveal">
+          <summary>Do you work with seniors and non-technical users?</summary>
+          <div class="spacer"></div>
+          <p class="muted">Absolutely. Patient, friendly help is core to our service. We can create printed guides and set up password managers too.</p>
+        </details>
+        <details class="reveal">
+          <summary>Can you build my business website?</summary>
+          <div class="spacer"></div>
+          <p class="muted">Yes — from simple sites to e-commerce. We handle domains, email, SEO basics, bookings, payments and maintenance.</p>
+        </details>
+        <details class="reveal">
+          <summary>Do you offer ongoing support plans?</summary>
+          <div class="spacer"></div>
+          <p class="muted">Yes. Monthly or quarterly plans for remote or on-site support keep everything up-to-date and secure.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- CONTACT (with MAP) -->
+    <section id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <h2 id="contact-title">Let’s talk</h2>
+          <p class="muted">Tell us what you need — we’ll reply with next steps and a friendly plan.</p>
+        </div>
+        <div class="cards" style="grid-template-columns: 1.2fr .8fr">
+          <div class="card reveal">
+            <form action="mailto:admin@doitbetterit.com" method="post" enctype="text/plain">
+              <div class="grid-2">
+                <div>
+                  <label for="name" class="muted">Name</label>
+                  <input id="name" name="name" required placeholder="Your name" />
+                </div>
+                <div>
+                  <label for="email" class="muted">Email</label>
+                  <input id="email" name="email" type="email" required placeholder="you@example.com" />
+                </div>
+              </div>
+              <div class="grid-2">
+                <div>
+                  <label for="phone" class="muted">Phone (optional)</label>
+                  <input id="phone" name="phone" placeholder="(optional)" />
+                </div>
+                <div>
+                  <label for="service" class="muted">Service</label>
+                  <select id="service" name="service">
+                    <option>Repairs & Setup</option><option>Websites & Hosting</option><option>Cybersecurity</option><option>Networking</option><option>Databases & Backend</option><option>Cloud Platforms</option><option>Senior Coaching</option><option>Business/Automation</option><option>Game Design Coaching</option><option>Something else</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="message" class="muted">How can we help?</label>
+                <textarea id="message" name="message" rows="6" placeholder="Briefly describe your issue or project"></textarea>
+              </div>
+              <div style="display:flex; gap:.8rem; align-items:center; flex-wrap:wrap">
+                <button type="submit" class="btn">Send Message</button>
+                <a class="btn btn-outline" href="#" onclick="openBooking(); return false;">Book a Free Consultation</a>
+              </div>
+              <p class="muted" style="margin:.6rem 0 0; font-size:.9rem">Prefer scheduling? The “Book” button is a placeholder — wire it to Calendly/TidyCal.</p>
+            </form>
+          </div>
+          <aside class="card reveal">
+            <h3>Contact details</h3>
+            <p class="muted">Based in <strong>Sunshine Coast</strong>. Serving local & remote clients.</p>
+            <ul>
+              <li>Email: <a href="mailto:admin@doitbetterit.com">admin@doitbetterit.com</a></li>
+              <li>Phone: <a href="tel:+61413016911">+61 413 016 911</a></li>
+              <li>Hours: Mon–Fri, 9am–5pm</li>
+              <li>ABN: 91 994 704 383</li>
+            </ul>
+            <!-- Interactive Map -->
+            <div id="map" class="reveal" aria-label="Map of service area: Sunshine Coast"></div>
+            <p class="muted" style="margin-top:8px; font-size:.85rem">
+              Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors.
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:grid; gap:16px">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap">
+        <div class="brand">
+          <div class="logo"><img src="images/logo.png" alt="Do I.T. Better logo"></div>
+          <strong>Do I.T. Better</strong>
+        </div>
+        <div class="badges" style="display:flex; gap:8px; flex-wrap:wrap">
+          <span class="badge pill">Tech Made Simple</span>
+          <span class="badge pill">“Clarity, not complexity.”</span>
+          <span class="badge pill">“We make tech worry-free.”</span>
+        </div>
+      </div>
+      <div class="muted">© <span id="year"></span> Do I.T. Better. All rights reserved. — From the basics to the backend: one partner, every solution.</div>
+    </div>
+  </footer>
+
+  <!-- CHAT -->
+  <div class="chat" id="chat">
+    <header class="nav">
+      <div style="padding:10px 0 10px 16px; font-weight:700">Quick Chat</div>
+      <button class="hamburger" aria-label="Close chat" onclick="toggleChat(false)">✕</button>
+    </header>
+    <div class="msgs" id="msgs" aria-live="polite">
+      <div class="bubble">Hi! Tell us your issue. We’ll reply via email/phone ASAP.</div>
+    </div>
+    <div class="row">
+      <input id="chatInput" placeholder="Type your message…" aria-label="Chat message" />
+      <button class="btn" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <div class="fab" id="fab">
+    <div class="menu">
+      <a class="quick" href="tel:+61413016911" aria-label="Call us">📞 Call</a>
+      <a class="quick" href="mailto:admin@doitbetterit.com" aria-label="Email us">✉️ Email</a>
+      <a class="quick" href="#contact" aria-label="Contact form">📝 Form</a>
+    </div>
+    <button class="btn-round" aria-label="Open quick actions" onclick="toggleFab()">⚡</button>
+    <button class="btn-round" aria-label="Open chat" onclick="toggleChat()">💬</button>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script>
+    // Mobile menu toggle
+    function toggleMenu(force){
+      const el = document.getElementById('mobileNav');
+      const willOpen = typeof force === 'boolean' ? force : !el.classList.contains('open');
+      el.classList.toggle('open', willOpen);
+    }
+    // Booking placeholder
+    function openBooking(){
+      alert('Hook this button to your booking tool (Calendly/TidyCal/Google Form).');
+    }
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scroll reveal
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:0.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+    // FAB
+    function toggleFab(force){
+      const el = document.getElementById('fab');
+      const willOpen = typeof force === 'boolean' ? force : !el.classList.contains('open');
+      el.classList.toggle('open', willOpen);
+    }
+    // Chat
+    function toggleChat(force){
+      const el = document.getElementById('chat');
+      const willOpen = typeof force === 'boolean' ? force : !el.classList.contains('open');
+      el.classList.toggle('open', willOpen);
+      if(willOpen){ document.getElementById('chatInput').focus(); }
+    }
+    function sendChat(){
+      const input = document.getElementById('chatInput');
+      const txt = input.value.trim();
+      if(!txt) return;
+      const msgs = document.getElementById('msgs');
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = txt;
+      msgs.appendChild(bubble);
+      input.value = '';
+      msgs.scrollTop = msgs.scrollHeight;
+      // TODO: wire to Formspree/Netlify/Azure Function
+    }
+
+    // THEME
+    const modeBtn = document.getElementById('modeBtn');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    function applyTheme(mode){
+      document.documentElement.setAttribute('data-theme',
+        mode === 'auto' ? (prefersDark.matches ? 'dark' : 'light') : mode
+      );
+      localStorage.setItem('dib-theme', mode);
+      modeBtn && (modeBtn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '🌙' : '☀️');
+    }
+    const saved = localStorage.getItem('dib-theme') || 'auto';
+    applyTheme(saved);
+    prefersDark.addEventListener('change', ()=> { if((localStorage.getItem('dib-theme')||'auto')==='auto') applyTheme('auto'); });
+    modeBtn?.addEventListener('click', ()=>{
+      const cur = localStorage.getItem('dib-theme') || 'auto';
+      const next = cur === 'light' ? 'dark' : cur === 'dark' ? 'auto' : 'light';
+      applyTheme(next);
+    });
+
+    // HERO PARALLAX for orbs (respect reduced-motion)
+    const allowMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(allowMotion){
+      const orbs = Array.from(document.querySelectorAll('.orb'));
+      window.addEventListener('mousemove', (e)=>{
+        const x = (e.clientX / window.innerWidth - 0.5);
+        const y = (e.clientY / window.innerHeight - 0.5);
+        orbs.forEach((o, i)=>{
+          const d = (i+1) * 8;
+          o.style.setProperty('--tx', `${x * d}px`);
+          o.style.setProperty('--ty', `${y * d}px`);
+        });
+      }, {passive:true});
+    }
+
+    // MAP (Leaflet + OSM) — Sunshine Coast area
+    // Center near Maroochydore; tweak if you want a different suburb.
+    const map = L.map('map', { scrollWheelZoom: false }).setView([-26.6500, 153.0667], 11);
+    const tile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const marker = L.marker([-26.6500, 153.0667]).addTo(map);
+    marker.bindPopup('<strong>Do I.T. Better</strong><br>Sunshine Coast service area').openPopup();
+
+    // Make sure map renders correctly when revealed
+    const mapEl = document.getElementById('map');
+    const obs = new IntersectionObserver((entries)=>{
+      if(entries.some(e=>e.isIntersecting)){ setTimeout(()=> { map.invalidateSize(); }, 200); obs.disconnect(); }
+    }, {threshold:0.2});
+    obs.observe(mapEl);
+  </script>
+</body>
+</html>
